@@ -18,6 +18,7 @@ export async function getSummary(ao3Url, logger) {
         const { document } = parseHTML(html);
 
         const title = document.querySelector(".title.heading").textContent.trim();
+        await logger.log("title: " + title);
         const author = document.querySelector(".byline.heading a[rel='author']").textContent;
         const authorLink = document.querySelector(".byline.heading a[rel='author']").href;
         const ships = Array.from(document.querySelectorAll("dd.relationship.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
@@ -70,7 +71,7 @@ export async function getSummary(ao3Url, logger) {
         await logger.log(result);
         return result;
     } catch (e) {
-        await logger.log(`Failed to parse ao3 url ${ao3Url}, ${e}`);
+        await logger.log(`Failed to parse ao3 url ${ao3Url}: ${e}\n${e.stack}`);
         return {
             content: "Failed to parse AO3 url :("
         };
