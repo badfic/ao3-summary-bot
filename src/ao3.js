@@ -1,6 +1,6 @@
 import { parseHTML } from 'linkedom';
 
-export async function getSummary(ao3Url) {
+export async function getSummary(ao3Url, logger) {
     try {
         const href = new URL(ao3Url);
         href.search = "view_adult=true&view_full_work=true";
@@ -37,10 +37,10 @@ export async function getSummary(ao3Url) {
         const archiveWarnings = Array.from(document.querySelectorAll("dd.warning.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
         const categories = Array.from(document.querySelectorAll("dd.category.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
         const summary = document.querySelector(".summary.module > blockquote").textContent;
-        const fandoms = Array.from(document.querySelectorAll("dd.fandoms.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const characters = Array.from(document.querySelectorAll("dd.characters.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const fandoms = Array.from(document.querySelectorAll("dd.fandom.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const characters = Array.from(document.querySelectorAll("dd.character.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
         const tags = Array.from(document.querySelectorAll("dd.freeform.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const language = document.querySelector("dd.language").textContent;
+        const language = (document.querySelector("dd.language").textContent).replace(/\s+/g, "");
 
         let color = 2416379903;
         if (contentRating === "T") {
@@ -53,29 +53,22 @@ export async function getSummary(ao3Url) {
             color = 3563849215;
         }
 
-        return {
+        const result = {
             embeds: [
                 {
                     title: `AO3 Summary Report`,
-                    description: `[**${title}**](${ao3Url})\n
-                    by [${author}](https://archiveofourown.org${authorLink})\n\n
-                    **Rating**: ${contentRating}\n\n
-                    **Warnings**: ${archiveWarnings}\n\n
-                    **Categories**: ${categories}\n\n
-                    **Summary**: ${summary}\n\n
-                    **Fandoms**: ${fandoms}\n\n
-                    **Relationships**: ${ships}\n\n
-                    **Characters**: ${characters}\n\n
-                    **Tags**: ${tags}`,
+                    description: `[**${title}**](${ao3Url})\nby [${author}](https://archiveofourown.org${authorLink})\n\n**Rating**: ${contentRating}\n\n**Warnings**: ${archiveWarnings}\n\n**Categories**: ${categories}\n\n**Summary**: ${summary}\n\n**Fandoms**: ${fandoms}\n\n**Relationships**: ${ships}\n\n**Characters**: ${characters}\n\n**Tags**: ${tags}`,
                     footer: `Words: ${wordCount} | Chapters: ${chapters} | ${language}`,
                     color: color,
                     thumbnail: "https://cdn.discordapp.com/attachments/707453916882665552/780261925212520508/wITXDY67Xw1sAAAAABJRU5ErkJggg.png"
                 }
             ]
         };
+
+        logger.log(result);
+        return result;
     } catch (e) {
-        console.error(e);
-        console.log("Failed to parse " + ao3Url);
+        logger.log(`Failed to parse ao3 url ${ao3Url}, ${e}`);
         return {
             content: "Failed to parse AO3 url :("
         };
