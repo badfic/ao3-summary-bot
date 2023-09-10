@@ -73,7 +73,7 @@ export async function getSummary(ao3Url, logger) {
         console.log(`Serialized result for ${ao3Url}: ${JSON.stringify(result)}`);
         return result;
     } catch (e) {
-        await logger.log(`Failed to parse ao3 url ${ao3Url}: ${e}\n${e.stack}`);
+        console.error(e);
         return {
             content: "Failed to parse AO3 url :("
         };
