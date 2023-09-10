@@ -1,6 +1,7 @@
 name = "ao3-summary-bot"
 main = "./src/server.js"
 compatibility_date="2023-05-18"
+node_compat = true
 
 # [secrets]
 # DISCORD_TOKEN
