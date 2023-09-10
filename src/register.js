@@ -1,5 +1,4 @@
-import { AWW_COMMAND, INVITE_COMMAND } from './commands.js';
-import dotenv from 'dotenv';
+import { AO3_COMMAND, INVITE_COMMAND } from './commands.js';
 import process from 'node:process';
 
 /**
@@ -7,8 +6,6 @@ import process from 'node:process';
  * application server.  It's allowed to use node.js primitives, and only needs
  * to be run once.
  */
-
-dotenv.config({ path: '.dev.vars' });
 
 const token = process.env.DISCORD_TOKEN;
 const applicationId = process.env.DISCORD_APPLICATION_ID;
@@ -34,7 +31,7 @@ const response = await fetch(url, {
     Authorization: `Bot ${token}`,
   },
   method: 'PUT',
-  body: JSON.stringify([AWW_COMMAND, INVITE_COMMAND]),
+  body: JSON.stringify([AO3_COMMAND, INVITE_COMMAND]),
 });
 
 if (response.ok) {

@@ -3,9 +3,9 @@
  * and registration.
  */
 
-export const AWW_COMMAND = {
-  name: 'awwww',
-  description: 'Drop some cuteness on this channel.',
+export const AO3_COMMAND = {
+  name: 'ao3',
+  description: 'Get summary of an AO3 url',
 };
 
 export const INVITE_COMMAND = {
