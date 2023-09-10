@@ -66,12 +66,12 @@ router.post("/", async (request, env) => {
     env,
   );
   if (!isValid || !interaction) {
-    logger.log("Received bad request to interaction endpoint. Bad signature. request: " + request)
+    await logger.log("Received bad request to interaction endpoint. Bad signature. request: " + request)
     return new Response("Bad request signature.", { status: 401 });
   }
 
   if (interaction.type === InteractionType.PING) {
-    logger.log("Received PING request");
+    await logger.log("Received PING request");
     // The `PING` message is used during the initial webhook handshake, and is
     // required to configure the webhook in the developer portal.
     return new JsonResponse({
@@ -83,7 +83,7 @@ router.post("/", async (request, env) => {
     // Most user commands will come as `APPLICATION_COMMAND`.
     switch (interaction.data.name.toLowerCase()) {
       case AO3_COMMAND.name.toLowerCase(): {
-        logger.log("Received AO3 request: " + JSON.stringify(interaction));
+        await logger.log("Received AO3 request: " + JSON.stringify(interaction));
         const ao3Url = interaction.data.options[0].value;
         const summaryContent = await getSummary(ao3Url, logger);
         return new JsonResponse({
@@ -94,7 +94,7 @@ router.post("/", async (request, env) => {
       case INVITE_COMMAND.name.toLowerCase(): {
         const applicationId = env.DISCORD_APPLICATION_ID;
         const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${applicationId}&scope=applications.commands`;
-        logger.log("Responding to invite request with: " + INVITE_URL);
+        await logger.log("Responding to invite request with: " + INVITE_URL);
         return new JsonResponse({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
@@ -108,7 +108,7 @@ router.post("/", async (request, env) => {
     }
   }
 
-  logger.log("Received unrecognized interaction request: " + request);
+  await logger.log("Received unrecognized interaction request: " + request);
   console.error("Unknown Type");
   return new JsonResponse({ error: "Unknown Type" }, { status: 400 });
 });

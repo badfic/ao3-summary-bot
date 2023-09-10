@@ -2,7 +2,7 @@ import { parseHTML } from 'linkedom';
 
 export async function getSummary(ao3Url, logger) {
     try {
-        logger.log("Attempting AO3 summary for " + ao3Url);
+        await logger.log("Attempting AO3 summary for " + ao3Url);
 
         const href = new URL(ao3Url);
         href.search = "view_adult=true&view_full_work=true";
@@ -67,10 +67,10 @@ export async function getSummary(ao3Url, logger) {
             ]
         };
 
-        logger.log(result);
+        await logger.log(result);
         return result;
     } catch (e) {
-        logger.log(`Failed to parse ao3 url ${ao3Url}, ${e}`);
+        await logger.log(`Failed to parse ao3 url ${ao3Url}, ${e}`);
         return {
             content: "Failed to parse AO3 url :("
         };
