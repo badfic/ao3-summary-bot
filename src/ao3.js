@@ -2,6 +2,8 @@ import { parseHTML } from 'linkedom';
 
 export async function getSummary(ao3Url, logger) {
     try {
+        logger.log("Attempting AO3 summary for " + ao3Url);
+
         const href = new URL(ao3Url);
         href.search = "view_adult=true&view_full_work=true";
 

@@ -14,8 +14,10 @@ class Logger {
     this.apiKey = apiKey;
   }
 
-  log(msg) {
-    fetch("https://api.logflare.app/api/logs?source=" + this.source, {
+  async log(msg) {
+    console.log(msg);
+
+    const result = await fetch("https://api.logflare.app/api/logs?source=" + this.source, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,6 +25,8 @@ class Logger {
       },
       body: JSON.stringify({message: msg})
     });
+
+    console.log("Sent log to logflare " + result);
   }
 }
 
@@ -79,7 +83,7 @@ router.post("/", async (request, env) => {
     // Most user commands will come as `APPLICATION_COMMAND`.
     switch (interaction.data.name.toLowerCase()) {
       case AO3_COMMAND.name.toLowerCase(): {
-        logger.log("Received AO3 request: " + interaction);
+        logger.log("Received AO3 request: " + JSON.stringify(interaction));
         const ao3Url = interaction.data.options[0].value;
         const summaryContent = await getSummary(ao3Url, logger);
         return new JsonResponse({
