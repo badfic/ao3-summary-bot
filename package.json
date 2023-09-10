@@ -7,11 +7,15 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "register": "node src/register.js"
+    "register": "node src/register.js",
+    "dev": "wrangler dev src/server.js"
   },
   "dependencies": {
     "discord-interactions": "3.4.0",
     "itty-router": "4.0.22",
-    "jsdom": "22.1.0"
+    "linkedom": "0.15.3"
+  },
+  "devDependencies": {
+    "wrangler": "3.7.0"
   }
 }

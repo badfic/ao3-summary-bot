@@ -1,4 +1,4 @@
-import { JSDOM } from "jsdom";
+import { parseHTML } from 'linkedom';
 
 export async function getSummary(ao3Url) {
     try {
@@ -13,14 +13,14 @@ export async function getSummary(ao3Url) {
         });
 
         const html = await data.text();
-        const dom = new JSDOM(html);
+        const { document } = parseHTML(html);
 
-        const title = dom.window.document.querySelector(".title.heading").textContent.trim();
-        const author = dom.window.document.querySelector(".byline.heading a[rel='author']").textContent;
-        const authorLink = dom.window.document.querySelector(".byline.heading a[rel='author']").href;
-        const ships = Array.from(dom.window.document.querySelectorAll("dd.relationship.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const wordCount = dom.window.document.querySelector("dd.words").textContent;
-        const contentRating = Array.from(dom.window.document.querySelectorAll("dd.rating.tags > ul.commas > li > a.tag")).map(x => {
+        const title = document.querySelector(".title.heading").textContent.trim();
+        const author = document.querySelector(".byline.heading a[rel='author']").textContent;
+        const authorLink = document.querySelector(".byline.heading a[rel='author']").href;
+        const ships = Array.from(document.querySelectorAll("dd.relationship.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const wordCount = document.querySelector("dd.words").textContent;
+        const contentRating = Array.from(document.querySelectorAll("dd.rating.tags > ul.commas > li > a.tag")).map(x => {
             const ratingName = x.textContent;
             if (ratingName.toUpperCase() === "GENERAL AUDIENCES") {
                 return "G"
@@ -33,14 +33,14 @@ export async function getSummary(ao3Url) {
             }
             return "NR"
         }).join(", ");
-        const chapters = dom.window.document.querySelector("dd.chapters").textContent;
-        const archiveWarnings = Array.from(dom.window.document.querySelectorAll("dd.warning.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const categories = Array.from(dom.window.document.querySelectorAll("dd.category.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const summary = dom.window.document.querySelector(".summary.module > blockquote").textContent;
-        const fandoms = Array.from(dom.window.document.querySelectorAll("dd.fandoms.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const characters = Array.from(dom.window.document.querySelectorAll("dd.characters.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const tags = Array.from(dom.window.document.querySelectorAll("dd.freeform.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
-        const language = dom.window.document.querySelector("dd.language").textContent;
+        const chapters = document.querySelector("dd.chapters").textContent;
+        const archiveWarnings = Array.from(document.querySelectorAll("dd.warning.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const categories = Array.from(document.querySelectorAll("dd.category.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const summary = document.querySelector(".summary.module > blockquote").textContent;
+        const fandoms = Array.from(document.querySelectorAll("dd.fandoms.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const characters = Array.from(document.querySelectorAll("dd.characters.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const tags = Array.from(document.querySelectorAll("dd.freeform.tags > ul.commas > li > a.tag")).map(x => x.textContent).join(", ");
+        const language = document.querySelector("dd.language").textContent;
 
         let color = 2416379903;
         if (contentRating === "T") {
