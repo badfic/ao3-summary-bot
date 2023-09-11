@@ -72,7 +72,7 @@ router.post("/", async (request, env) => {
           }
 
           const apiRequest = JSON.stringify({
-            apiKey: env.AO3_MICROSERVICE_API_KEY,
+            apiKey: env.AO3_SUMMARY_API_KEY,
             ao3Url: ao3Url,
             webhookUrl: `https://discordapp.com/api/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`
           });
