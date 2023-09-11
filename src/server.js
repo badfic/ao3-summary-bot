@@ -5,30 +5,7 @@ import {
   verifyKey,
 } from "discord-interactions";
 import { AO3_COMMAND, INVITE_COMMAND } from "./commands.js";
-import { getSummary } from "./ao3.js";
 import { InteractionResponseFlags } from "discord-interactions";
-
-class Logger {
-  constructor(source, apiKey) {
-    this.source = source;
-    this.apiKey = apiKey;
-  }
-
-  async log(msg) {
-    console.log(msg);
-
-    const result = await fetch("https://api.logflare.app/api/logs?source=" + this.source, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey
-      },
-      body: JSON.stringify({message: msg})
-    });
-
-    console.log("Sent log to logflare " + result);
-  }
-}
 
 class JsonResponse extends Response {
   constructor(body, init) {
@@ -77,12 +54,53 @@ router.post("/", async (request, env) => {
     // Most user commands will come as `APPLICATION_COMMAND`.
     switch (interaction.data.name.toLowerCase()) {
       case AO3_COMMAND.name.toLowerCase(): {
-        const logger = new Logger(env.LOGFLARE_TOKEN, env.LOGFLARE_API_KEY);
         const ao3Url = interaction.data.options[0].value;
-        const summaryContent = await getSummary(ao3Url, logger);
+
+        try {
+          const ao3UrlRegex = /^(?:http(s)?:\/\/)?(archiveofourown\.org\/works\/)([0-9]+).*$/i
+
+          if (!ao3Url.match(ao3UrlRegex)) {
+            return new JsonResponse({
+              type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+              data: {
+                content: "Unrecognized AO3 url"
+              }
+            });
+          }
+
+          const fetchResponse = await fetch(env.AO3_MICROSERVICE_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: {
+              apiKey: env.AO3_MICROSERVICE_API_KEY,
+              ao3Url: ao3Url,
+              webhookUrl: `https://discordapp.com/api/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`
+            }
+          });
+
+          if (fetchResponse.status === 400) {
+            return new JsonResponse({
+              type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+              data: {
+                content: "Unrecognized Request"
+              }
+            });
+          } else if (fetchResponse.status === 200) {
+            return new JsonResponse({
+              type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+
         return new JsonResponse({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: summaryContent
+          data: {
+            content: "Please try again later"
+          }
         });
       }
       case INVITE_COMMAND.name.toLowerCase(): {
