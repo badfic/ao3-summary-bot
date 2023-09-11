@@ -56,10 +56,13 @@ router.post("/", async (request, env) => {
       case AO3_COMMAND.name.toLowerCase(): {
         const ao3Url = interaction.data.options[0].value;
 
+        console.log("Received request for AO3 summary: " + ao3Url);
+
         try {
           const ao3UrlRegex = /^(?:http(s)?:\/\/)?(archiveofourown\.org\/works\/)([0-9]+).*$/i
 
           if (!ao3Url.match(ao3UrlRegex)) {
+            console.log("URL was not an ao3 url: " + ao3Url);
             return new JsonResponse({
               type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
               data: {
@@ -68,17 +71,23 @@ router.post("/", async (request, env) => {
             });
           }
 
+          const apiRequest = JSON.stringify({
+            apiKey: env.AO3_MICROSERVICE_API_KEY,
+            ao3Url: ao3Url,
+            webhookUrl: `https://discordapp.com/api/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`
+          });
+
+          console.log("AO3 Summary API Request: " + apiRequest);
+
           const fetchResponse = await fetch(env.AO3_MICROSERVICE_URL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            body: {
-              apiKey: env.AO3_MICROSERVICE_API_KEY,
-              ao3Url: ao3Url,
-              webhookUrl: `https://discordapp.com/api/webhooks/${env.DISCORD_APPLICATION_ID}/${interaction.token}/messages/@original`
-            }
+            body: apiRequest
           });
+
+          console.log("Received status=" + fetchResponse.status + " from AO3 Summary API");
 
           if (fetchResponse.status === 400) {
             return new JsonResponse({
