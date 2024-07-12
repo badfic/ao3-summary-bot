@@ -11,11 +11,11 @@
     "dev": "wrangler dev src/server.js"
   },
   "dependencies": {
-    "discord-interactions": "3.4.0",
-    "itty-router": "4.0.22",
-    "linkedom": "0.15.3"
+    "discord-interactions": "4.0.0",
+    "itty-router": "5.0.17",
+    "linkedom": "0.18.4"
   },
   "devDependencies": {
-    "wrangler": "3.7.0"
+    "wrangler": "3.64.0"
   }
 }
